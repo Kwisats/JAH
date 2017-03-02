@@ -23,15 +23,24 @@ run(1, 4) - печатает "2\n" и "3\n"
 =cut
 
 sub run {
-    my ($x, $y) = @_;
-    for (my $i = $x; $i <= $y; $i++) {
-
-        # ...
-        # Проверка, что число простое
-        # ...
-
-	print "$i\n";
-    }
+	my ($x, $y) = @_;
+	my $simple; #marker    
+	for (my $i = $x; $i <= $y; $i++) {
+        $simple = 1;
+		if ($i>1) {        
+			for(my $j = 2; $j <= sqrt($i); $j++ ) {
+				if( $i % $j == 0 ) {
+					$simple = 0;
+				}#don't know how to make "break" yet
+			}
+		} else {
+			$simple = 0;		
+		}
+		if ($simple == 1) {
+			print "$i\n";
+		}    
+		
+	}
 }
 
 1;

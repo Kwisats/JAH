@@ -26,11 +26,8 @@ run(6) - печатает "1\n"
 sub run {
     my ($x) = @_;
     my $num = 0;
-
-    # ...
-    # Вычисление номера первого ненулевого бита 
-    # ...
-
+	my $str = sprintf "%b", $x;
+	$num = length($str) - rindex($str, "1") - 1; 
     print "$num\n";
 }
 

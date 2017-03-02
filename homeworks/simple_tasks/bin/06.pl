@@ -23,10 +23,11 @@ sub encode {
     my ($str, $key) = @_;
     my $encoded_str = '';
 
-    # ...
-    # Алгоритм шифрования
-    # ...
-
+    my @buff = unpack("C*",$str);
+	for my $i (@buff){
+		$i = ($i + $key)%127;
+	}
+	$encoded_str = pack("C*",@buff);
     print "$encoded_str\n";
 }
 
@@ -45,11 +46,13 @@ sub decode {
     my ($encoded_str, $key) = @_;
     my $str = '';
 
-    # ...
-    # Алгоритм дешифрования
-    # ...
-
-    print "$str\n";
+    my @buff = unpack("C*",$encoded_str);
+	for my $i (@buff){
+		$i = ($i - $key + 127)%127;
+	}
+	$str = pack("C*",@buff);
+  
+	print "$str\n";
 }
 
 1;
