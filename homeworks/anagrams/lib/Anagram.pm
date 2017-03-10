@@ -87,9 +87,7 @@ sub anagram {
 	
 	my %output;
 	for my $key (keys %result) {
-		$output {encode('UTF-8',$key)} = [];
-	}
-	for my $key (keys %result) {
+		$output {encode('UTF-8',$key)} = [];		
 		for my $word (@{$result{$key}}) {		
 			push @{$output{encode('UTF-8',$key)}}, encode('UTF-8',$word);			
 		}	
