@@ -97,7 +97,6 @@ sub anagram {
 
     return \%output;
 }
-anagram();
 1;
 
 
