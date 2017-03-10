@@ -21,7 +21,17 @@ use Data::Dumper;
 local $Data::Dumper::Indent = 0;
 
 #replace $orig value with your structure
-my $orig   = undef; 
+
+my $orig = [ 1, 2, 3 ];
+$orig->[4] = $orig;
+$orig->[5] = $orig;
+$orig->[6] = [ 1, 2, 3, [ { 1 => $orig } ] ];
+
+my $origh = { a => 1, b => 2 };
+$origh->{c} = $origh;
+$origh->{d} = $origh;
+$origh->{e} = { a => 1, b => 2, [ { 1 => $origh } ] };
+#$orig = $origh;
 my $cloned = DeepClone::clone($orig);
 
 say "ORIGINAL ", Dumper($orig);

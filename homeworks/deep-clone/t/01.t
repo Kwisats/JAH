@@ -66,10 +66,12 @@ sub test_deep {
 my $CYCLE_ARRAY = [ 1, 2, 3 ];
 $CYCLE_ARRAY->[4] = $CYCLE_ARRAY;
 $CYCLE_ARRAY->[5] = $CYCLE_ARRAY;
+$CYCLE_ARRAY->[6] = [ 1, 2, 3, [ { 1 => $CYCLE_ARRAY } ] ];
 
 my $CYCLE_HASH = { a => 1, b => 2 };
 $CYCLE_HASH->{c} = $CYCLE_HASH;
 $CYCLE_HASH->{d} = $CYCLE_HASH;
+$CYCLE_HASH->{e} = { a => 1, b => 2, [ { 1 => $CYCLE_HASH } ] };
 
 my $TESTS = [
     {
@@ -143,7 +145,7 @@ my $TESTS = [
         modifier => sub { $_[0]->{f}{k4}{kk3}[1] = 10 },
     },
     {
-        name => 'cycle array',
+   	    name => 'cycle array',
         orig => $CYCLE_ARRAY,
         modifier => sub { $_[0]->[20] = 10 },
     },
