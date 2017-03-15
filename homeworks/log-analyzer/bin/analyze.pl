@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use POSIX;
 
+
 my $filepath = $ARGV[0];
 die "USAGE:\n$0 <log-file.bz2>\n"  unless $filepath;
 die "File '$filepath' not found\n" unless -f $filepath;
@@ -48,8 +49,8 @@ sub parse_file {
 
 		#minutes
 		unless(defined $hash{$1}{previous_minute}) {
-			$hash{$1}{previous_minute}=$3;
-			$hash{$1}{minutes}=1;		
+			$hash{$1}{previous_minute}='';
+			$hash{$1}{minutes}=0;		
 		}
 		if($3 ne $hash{$1}{previous_minute}) {
 			$hash{$1}{minutes}+=1; 
@@ -65,17 +66,16 @@ sub parse_file {
 			$hash{total}{$5}=0;
 		}
 		unless(defined $hash{$1}{$5}) {
-			$hash{$1}{$5}=0;
-			
+			$hash{$1}{$5}=0;			
 		}
-		unless(defined $hash{$1}{$5}) {
+		unless(defined $hash{$1}{data}) {
 			$hash{$1}{data}=0;
 		}
 		if($5 eq '200') {
-			unless($9 eq '-') {
+			if($9 ne '-') {
 				$hash{$1}{data}+=$6*$9;
 				$hash{total}{data}+=$6*$9;
-			}	
+			}
 		}
 		$hash{$1}{$5}+=$6;
 		$hash{total}{$5}+=$6;
@@ -88,7 +88,7 @@ sub parse_file {
 	for my $key (sort { $hash{$b}{count} <=> $hash{$a}{count}} keys %hash) {
 		if ($i<11) {
 			print $key,"\t",$hash{$key}{count},"\t";
-			printf("%.2f\t",$hash{$key}{count}/$hash{$key}{minutes});
+			printf("%.4f\t",$hash{$key}{count}/$hash{$key}{minutes});
 			if (defined $hash{$key}{data}) {
 				printf("%d\t",floor($hash{$key}{data}/1024));
 			}else {
@@ -105,13 +105,22 @@ sub parse_file {
 			$i++;
 		}	
 	}
-
+=pod
+	my $sum=0;
+	my $number=0;
+	for my $key(keys %hash) {
+		unless($key eq 'total') {
+			$sum+=$hash{$key}{count}/$hash{$key}{minutes};
+			$number++;		
+		}
+	}
+	print $sum;
+=cut
     return $result;
 }
 sub report {
     my $result = shift;
-	#i know it is better to write output here, but i'm in hurry
+	#i know it is better to write output here, but i'm in hurry, sorry.
     # you can put your code here
-
 }
 
