@@ -28,8 +28,6 @@ sub parse_file {
 	my $result;
     open my $fd, "-|", "bunzip2 < $file" or die "Can't open '$file': $!";
     while (my $log_line = <$fd>) {
-        # you can put your code here
-        # $log_line contains line from log file
 		$check=0;
 		$log_line =~ /([^$q1]+)\ \[((.+):[^$q2]+)\]\ "(.+)"\ (\d+)\ (\d+)\ "([^"]+)"\ "([^"]+)"\ "([^"]+)"/;
 	
@@ -105,22 +103,10 @@ sub parse_file {
 			$i++;
 		}	
 	}
-=pod
-	my $sum=0;
-	my $number=0;
-	for my $key(keys %hash) {
-		unless($key eq 'total') {
-			$sum+=$hash{$key}{count}/$hash{$key}{minutes};
-			$number++;		
-		}
-	}
-	print $sum;
-=cut
     return $result;
 }
 sub report {
     my $result = shift;
 	#i know it is better to write output here, but i'm in hurry, sorry.
-    # you can put your code here
 }
 
