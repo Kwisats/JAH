@@ -28,6 +28,8 @@ sub parse_file {
 	my $result;
     open my $fd, "-|", "bunzip2 < $file" or die "Can't open '$file': $!";
     while (my $log_line = <$fd>) {
+        # you can put your code here
+        # $log_line contains line from log file
 		$check=0;
 		$log_line =~ /([^$q1]+)\ \[((.+):[^$q2]+)\]\ "(.+)"\ (\d+)\ (\d+)\ "([^"]+)"\ "([^"]+)"\ "([^"]+)"/;
 	
@@ -73,6 +75,9 @@ sub parse_file {
 			if($9 ne '-') {
 				$hash{$1}{data}+=$6*$9;
 				$hash{total}{data}+=$6*$9;
+			}else {
+				$hash{$1}{data}+=$6;
+				$hash{total}{data}+=$6;
 			}
 		}
 		$hash{$1}{$5}+=$6;
@@ -81,12 +86,12 @@ sub parse_file {
     close $fd;
 	#output
 	@codes = sort {$a<=>$b} @codes;
-	print "IP\tcount\tavg\tdata\tdata_200\tdata_301\tdata_302\tdata_400\tdata_403\tdata_404\tdata_408\tdata_414\tdata_499\tdata_500\n";
+	print "IP\tcount\tavg\tdata\t200\t301\t302\t400\t403\t404\t408\t414\t499\t500\n";
 	my $i=0;
 	for my $key (sort { $hash{$b}{count} <=> $hash{$a}{count}} keys %hash) {
 		if ($i<11) {
 			print $key,"\t",$hash{$key}{count},"\t";
-			printf("%.4f\t",$hash{$key}{count}/$hash{$key}{minutes});
+			printf("%.2f\t",$hash{$key}{count}/$hash{$key}{minutes});
 			if (defined $hash{$key}{data}) {
 				printf("%d\t",floor($hash{$key}{data}/1024));
 			}else {
@@ -103,6 +108,17 @@ sub parse_file {
 			$i++;
 		}	
 	}
+=pod
+	my $sum=0;
+	my $number=0;
+	for my $key(keys %hash) {
+		unless($key eq 'total') {
+			$sum+=$hash{$key}{count}/$hash{$key}{minutes};
+			$number++;		
+		}
+	}
+	print $sum;
+=cut
     return $result;
 }
 sub report {
