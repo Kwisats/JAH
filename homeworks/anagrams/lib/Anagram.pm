@@ -79,7 +79,7 @@ sub anagram {
 		$result{$word} = [$word];
 	}
 	for my $key (keys %result) {#it should be 2 "for"
-		delete $result{$key},last if @{$result{$key}} == 1;
+		delete $result{$key} if @{$result{$key}} == 1;
 	}	
 	for my $key (keys %result) {
 		@{$result{$key}} = sort { $a cmp $b } @{$result{$key}}
