@@ -9,7 +9,7 @@ use DDP;
 use Encode qw(decode encode);
 use utf8;
 #binmode(STDIN,':utf8');
-binmode(STDOUT,':utf8');
+#binmode(STDOUT,':utf8');
 
 =encoding UTF8
 
@@ -46,49 +46,45 @@ anagram(['пятак', 'ЛиСток', 'пятка', 'стул', 'ПяТаК', '
 
 =cut
 
-sub check_anagram{
-	my $str1 = shift;
-	my $str2 = shift;
-	return 0 if (length $str1 ne length $str2);	
-	my @array1 = sort { $a cmp $b } split //, $str1;
-	my @array2 = sort { $a cmp $b } split //, $str2; 
-	for my $i (0..$#array1) {
-		return 0 if $array1[$i] ne $array2[$i]
-	}	
-	return 1;
-} 
-
 sub anagram {
-    my $words_list = shift; #= ['пятка', 'слиток', 'пятак', 'ЛиСток', 'стул', 'ПяТаК', 'тяпка', 'столик', 'слиток'];
+    my $words_list = shift;# ['пятка', 'слиток', 'пятак', 'ЛиСток', 'стул', 'ПяТаК', 'тяпка', 'столик', 'слиток'];
     my %result;
+	my @ideas;
+	#make array of "sorted" words
+	my @buff_array;
+	my $buff;
 	for my $word (@{$words_list}) {
-		$word = lc decode('UTF-8',$word);
-		next if exists $result{$word};		
-		my $check=0; 
-		for my $key (keys %result) {
-			if (check_anagram($key,$word)){
-				for my $buff(@{$result{$key}}){	
-					$check = 1, last if $word eq $buff;
-				}			
-				push @{$result{$key}},$word if $check == 0;
-				$check = 1;
-				last; 
-			}
-		}	 
-		next if $check==1;
-		$result{$word} = [$word];
+		$buff = $word = lc decode('UTF-8',$word);
+		@buff_array = sort { $a cmp $b } split //, $buff;
+		$buff = join('',@buff_array);		
+		push @ideas, $buff;
+	}	
+	#make hash of idea => words
+	for my $i (0..$#ideas) {
+		if(exists $result{$ideas[$i]}) {
+			unless(scalar grep{$_ eq $words_list->[$i]} @{$result{$ideas[$i]}}) {			
+				push @{$result{$ideas[$i]}}, $words_list->[$i]; 
+			}		
+		} else{
+			$result{$ideas[$i]} = [$words_list->[$i]];
+		}
 	}
-	for my $key (keys %result) {#it should be 2 "for"
+	#delete single words	
+	for my $key (keys %result) {
 		delete $result{$key} if @{$result{$key}} == 1;
 	}	
+	#sort arrays and change key_word to first from array
+	my %buff_output;
 	for my $key (keys %result) {
-		@{$result{$key}} = sort { $a cmp $b } @{$result{$key}}
-	}
-	
+		push @{$buff_output{$result{$key}[0]}}, sort { $a cmp $b } @{$result{$key}};
+	}#I don't sure it is always correct, because here it is critical that first argument of "push" should be called first
+	#make output encoding
 	my %output;
-	for my $key (keys %result) {
-		$output {encode('UTF-8',$key)} = [];		
-		for my $word (@{$result{$key}}) {		
+	for my $key (keys %buff_output) {
+		$output {encode('UTF-8',$key)} = [];
+	}
+	for my $key (keys %buff_output) {
+		for my $word (@{$buff_output{$key}}) {		
 			push @{$output{encode('UTF-8',$key)}}, encode('UTF-8',$word);			
 		}	
 	}
