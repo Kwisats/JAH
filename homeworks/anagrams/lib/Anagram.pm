@@ -50,21 +50,18 @@ sub anagram {
     my $words_list = shift;# ['пятка', 'слиток', 'пятак', 'ЛиСток', 'стул', 'ПяТаК', 'тяпка', 'столик', 'слиток'];
     my %result;
 	my @ideas;
-	#make array of "sorted" words
-	my @buff_array;
-	my $buff;
-	for my $word (@{$words_list}) {
-		$buff = $word = lc decode('UTF-8',$word);
-		@buff_array = sort { $a cmp $b } split //, $buff;
-		$buff = join('',@buff_array);		
-		push @ideas, $buff;
+	#make array of "sorted" words (ideas)
+	for my $word (@$words_list) {
+		$word = lc decode('UTF-8',$word);			
+		push @ideas, join '', sort split //,$word;
 	}	
-	#make hash of idea => words
+	#make hash of idea => words. Need iterator $i to have a connection between arrays of words and ideas
 	for my $i (0..$#ideas) {
 		if(exists $result{$ideas[$i]}) {
+			#every word only 1 time
 			unless(scalar grep{$_ eq $words_list->[$i]} @{$result{$ideas[$i]}}) {			
 				push @{$result{$ideas[$i]}}, $words_list->[$i]; 
-			}		
+			}
 		} else{
 			$result{$ideas[$i]} = [$words_list->[$i]];
 		}
@@ -76,8 +73,8 @@ sub anagram {
 	#sort arrays and change key_word to first from array
 	my %buff_output;
 	for my $key (keys %result) {
-		push @{$buff_output{$result{$key}[0]}}, sort { $a cmp $b } @{$result{$key}};
-	}#I don't sure it is always correct, because here it is critical that first argument of "push" should be called first
+		push @{$buff_output{$result{$key}[0]}}, sort @{$result{$key}};
+	}
 	#make output encoding
 	my %output;
 	for my $key (keys %buff_output) {
