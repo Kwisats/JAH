@@ -34,64 +34,57 @@ use DDP;
 
 =cut
 
-sub clone {
-	my $orig = shift;
-	my $start = shift;
-	$start = $orig unless defined $start;	
-	my $cloned;
-	return $cloned unless (defined $orig);	
-	return $cloned = $orig unless (ref $orig);
-	
+sub deep {
+	my $orig = $_[0];
+	my $cloned; 
+	#check $orig on type of ref and copy
+	if (ref $orig eq 'HASH') {
+		$cloned = {%$orig};
+	}elsif (ref $orig eq 'ARRAY') {
+		$cloned = [@$orig];
+	}else {
+		$_[1] = 1;
+		return undef;
+	}
+	#remember new ref in %seen
+	my $seen = $_[2];	
+	unless (defined $seen->{$orig}) {
+		$seen->{$orig} = $cloned; 
+	}
+	#substitute copied refs with use of deep() and %seen
 	if (ref $orig eq 'ARRAY') {
-		#$cloned = [];
-		for my $scal (@{$orig}) {
-			unless (defined $scal) {
-				push @{$cloned}, undef;
-				next;
-			}
-			if ($scal eq $start) {
-				push @{$cloned}, $cloned;
-			}else {			
-				push @{$cloned}, clone($scal,$start); 
+		for my $element (@$cloned) {
+			if (defined $element && scalar grep{$_ eq $element} keys %$seen) {			
+				$element = $seen->{$element};
+			}elsif (ref $element) {
+				$element = deep($element, $_[1], $seen);
 			}
 		}
-		#p $orig;
-		p $cloned;
-		return $cloned;
+	}elsif (ref $orig eq 'HASH') {
+		for my $value (values %$cloned) {
+			if (defined $value && scalar grep{$_ eq $value} keys %$seen) {			
+				$value = $seen->{$value};
+			}elsif (ref $value) {
+				$value = deep($value, $_[1], $seen);
+			}
+		}
 	}
 
-	if (ref $orig eq 'HASH') {
-		$cloned = {};
-		for my $key (keys %{$orig}) {
-			unless (defined $orig->{$key}) {
-				$cloned->{$key} = undef;
-				next;
-			}			
-			if ($orig->{$key} eq $start) {
-				$cloned->{$key} = $cloned; 
-			} else {
-				$cloned->{$key} = clone($orig->{$key},$start);
-			}					
-		}
-		#p $orig;
-		#p $cloned;
-		return $cloned;
-	} 
+	return $cloned;
+}
 
-	return undef;
+sub clone {
+	my $orig = shift;
+	my $cloned;
+	return undef unless defined $orig;
+	return $cloned = $orig unless ref $orig;	
+	my $check_function = 0; 
+	my $seen = {};
+	$cloned = deep($orig, $check_function, $seen);
+	return undef if $check_function == 1;
+	return $cloned;
 }
 1;
-
-
-
-
-
-
-
-
-
-
-
 
 
 
