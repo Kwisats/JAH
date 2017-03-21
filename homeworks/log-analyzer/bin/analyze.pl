@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use POSIX;
-
+use List::Util qw(sum);
 
 my $filepath = $ARGV[0];
 die "USAGE:\n$0 <log-file.bz2>\n"  unless $filepath;
@@ -16,72 +16,39 @@ exit;
 sub parse_file {
     my $file = shift;
 	my %hash;
+	my %minutes;
 	my @codes;
 	my $check;
-	my $time;
-	$hash{total}{count}=0;
-	$hash{total}{data}=0;
-	$hash{total}{minutes}=0;
-	$hash{total}{previous_minute}=0;
-	my $q1 = quotemeta('[');
-	my $q2 = quotemeta(']');		
 	my $result;
     open my $fd, "-|", "bunzip2 < $file" or die "Can't open '$file': $!";
     while (my $log_line = <$fd>) {
-        # you can put your code here
-        # $log_line contains line from log file
-		$check=0;
-		$log_line =~ /([^$q1]+)\ \[((.+):[^$q2]+)\]\ "(.+)"\ (\d+)\ (\d+)\ "([^"]+)"\ "([^"]+)"\ "([^"]+)"/;
+        $check=0;
+		$log_line =~ /(?<ip>[^\[]*)\ \[((?<minute>\d+\/\w+\/\d+:\d+:\d+):[^\]]*)\]\ "(.*)"\ (?<status>\d*)\ (?<data>\d*)\ "([^"]*)"\ "([^"]*)"\ "(?<comprassion>[^"]+)"/;
+		
+		$minutes{total}{$+{minute}}++;
+		$minutes{$+{ip}}{$+{minute}}++;		
+		
+		#count
+		$hash{total}{count} += 1;
+		$hash{$+{ip}}{count} += 1; 
 	
-		#count	
-		$hash{total}{count}+=1;
-		if (defined $hash{$1}{count}) {
-			$hash{$1}{count}+=1; 
-		}else {
-			$hash{$1}{count}=1;
-		}
-
 		#codes
 		for my $code (@codes) {
-			$check=1,last if $code == $5;
+			$check=1,last if $code == $+{status};
 		}
-		push @codes, $5 if $check == 0;
+		push @codes, $+{status} if $check == 0;
 
-		#minutes
-		unless(defined $hash{$1}{previous_minute}) {
-			$hash{$1}{previous_minute}='';
-			$hash{$1}{minutes}=0;		
-		}
-		if($3 ne $hash{$1}{previous_minute}) {
-			$hash{$1}{minutes}+=1; 
-			$hash{$1}{previous_minute}=$3;
-		}
-		if($3 ne $hash{total}{previous_minute}) {
-			$hash{total}{minutes}+=1;
-			$hash{total}{previous_minute}=$3;
-		}
-
-		#data and status
-		unless(defined $hash{total}{$5}) {
-			$hash{total}{$5}=0;
-		}
-		unless(defined $hash{$1}{$5}) {
-			$hash{$1}{$5}=0;			
-		}
-		unless(defined $hash{$1}{data}) {
-			$hash{$1}{data}=0;
-		}
-		if($5 eq '200') {
-			if($9 ne '-') {
-				$hash{$1}{data}+=$6*$9;
-				$hash{total}{data}+=$6*$9;
+		if($+{status} eq '200') {
+			if($+{comprassion} ne '-') {
+				$hash{$+{ip}}{data}+=$+{data}*$+{comprassion};
+				$hash{total}{data}+=$+{data}*$+{comprassion};
 			}else {
-				$hash{$1}{data}+=$6;
-				$hash{total}{data}+=$6;
+				$hash{$+{ip}}{data}+=$+{data};
+				$hash{total}{data}+=$+{data};
 			}
 		}
-		$hash{$1}{$5}+=$6;
-		$hash{total}{$5}+=$6;
+		$hash{$+{ip}}{$+{status}}+=$+{data};
+		$hash{total}{$+{status}}+=$+{data};
     }
     close $fd;
 	#output
@@ -90,39 +57,33 @@ sub parse_file {
 	my $i=0;
 	for my $key (sort { $hash{$b}{count} <=> $hash{$a}{count}} keys %hash) {
 		if ($i<11) {
+			#count
 			print $key,"\t",$hash{$key}{count},"\t";
-			printf("%.2f\t",$hash{$key}{count}/$hash{$key}{minutes});
+			#avg			
+			printf("%.2f\t",sum(values %{$minutes{$key}})/keys %{$minutes{$key}});
+			#data			
 			if (defined $hash{$key}{data}) {
 				printf("%d\t",floor($hash{$key}{data}/1024));
 			}else {
 				print "0\t";
 			}
+			#data_<code>
 			for my $code (@codes) {
 				if(defined $hash{$key}{$code}) {
-					printf("%d\t",floor($hash{$key}{$code}/1024));
+					printf("%d\t",floor($hash{$key}{$code}/1024)) if $code ne '500';
+					printf("%d",floor($hash{$key}{$code}/1024)) if $code eq '500';			
 				}else {
-					print "0\t";
+					print "0\t" if $code ne '500';
+					print "0" if $code eq '500';
 				}			
 			}
 			print "\n";
 			$i++;
 		}	
 	}
-=pod
-	my $sum=0;
-	my $number=0;
-	for my $key(keys %hash) {
-		unless($key eq 'total') {
-			$sum+=$hash{$key}{count}/$hash{$key}{minutes};
-			$number++;		
-		}
-	}
-	print $sum;
-=cut
     return $result;
 }
 sub report {
     my $result = shift;
-	#i know it is better to write output here, but i'm in hurry, sorry.
 }
 
