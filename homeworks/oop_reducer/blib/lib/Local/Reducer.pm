@@ -32,8 +32,8 @@ sub reduced {
 sub reduce_all {
 	my $self = shift;
 	my $sum = 0;
-	while ( defined (my $buff = $self->{source}->next()) ) {
-		my $row = *{$self->{row_class}}->new($buff);# my $row = Local::Row::JSON->new($buff);
+	while ( defined (my $buff = $self->{source}->next()) ) {#one big ?
+		my $row = *{$self->{row_class}}->new($buff);
 		$sum += $row->get($self->{field},0);
 	}
 	return $sum;
