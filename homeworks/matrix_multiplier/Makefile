@@ -1,4 +1,4 @@
-# This Makefile is for the myconst extension to perl.
+# This Makefile is for the Local::MatrixMultiplier extension to perl.
 #
 # It was generated automatically by MakeMaker version
 # 7.0401 (Revision: 70401) from the contents of
@@ -13,10 +13,9 @@
 
 #     BUILD_REQUIRES => {  }
 #     CONFIGURE_REQUIRES => {  }
-#     NAME => q[myconst]
+#     NAME => q[Local::MatrixMultiplier]
 #     PREREQ_PM => {  }
 #     TEST_REQUIRES => {  }
-#     VERSION_FROM => q[lib/myconst.pm]
 
 # --- MakeMaker post_initialize section:
 
@@ -53,13 +52,13 @@ VENDORLIBEXP = /usr/share/perl5
 AR_STATIC_ARGS = cr
 DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
-NAME = myconst
-NAME_SYM = myconst
-VERSION = 1.00
+NAME = Local::MatrixMultiplier
+NAME_SYM = Local_MatrixMultiplier
+VERSION = 
 VERSION_MACRO = VERSION
-VERSION_SYM = 1_00
+VERSION_SYM = 
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 1.00
+XS_VERSION = 
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -143,11 +142,11 @@ MM_REVISION = 70401
 # PARENT_NAME = NAME without BASEEXT and no trailing :: (eg Foo::Bar)
 # DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
 MAKE = make
-FULLEXT = myconst
-BASEEXT = myconst
-PARENT_NAME = 
+FULLEXT = Local/MatrixMultiplier
+BASEEXT = MatrixMultiplier
+PARENT_NAME = Local
 DLBASE = $(BASEEXT)
-VERSION_FROM = lib/myconst.pm
+VERSION_FROM = 
 OBJECT = 
 LDFROM = $(OBJECT)
 LINKTYPE = dynamic
@@ -159,14 +158,14 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/myconst.pm
+MAN3PODS = 
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
 
 # Where to build things
-INST_LIBDIR      = $(INST_LIB)
-INST_ARCHLIBDIR  = $(INST_ARCHLIB)
+INST_LIBDIR      = $(INST_LIB)/Local
+INST_ARCHLIBDIR  = $(INST_ARCHLIB)/Local
 
 INST_AUTODIR     = $(INST_LIB)/auto/$(FULLEXT)
 INST_ARCHAUTODIR = $(INST_ARCHLIB)/auto/$(FULLEXT)
@@ -182,10 +181,10 @@ PERL_ARCHIVEDEP    =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/myconst.pm
+TO_INST_PM = lib/Local/MatrixMultiplier.pm
 
-PM_TO_BLIB = lib/myconst.pm \
-	blib/lib/myconst.pm
+PM_TO_BLIB = lib/Local/MatrixMultiplier.pm \
+	blib/lib/Local/MatrixMultiplier.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -254,8 +253,8 @@ CI = ci -u
 RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
-DISTNAME = myconst
-DISTVNAME = myconst-1.00
+DISTNAME = Local-MatrixMultiplier
+DISTVNAME = Local-MatrixMultiplier-
 
 
 # --- MakeMaker macro section:
@@ -409,10 +408,8 @@ POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
 
 
-manifypods : pure_all  \
-	lib/myconst.pm
-	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) -u \
-	  lib/myconst.pm $(INST_MAN3DIR)/myconst.$(MAN3EXT) 
+manifypods : pure_all 
+	$(NOECHO) $(NOOP)
 
 
 
@@ -492,13 +489,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
 	$(NOECHO) $(ECHO) '  version: '\''1.4'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'name: myconst' >> META_new.yml
+	$(NOECHO) $(ECHO) 'name: Local-MatrixMultiplier' >> META_new.yml
 	$(NOECHO) $(ECHO) 'no_index:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  directory:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires: {}' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''1.00'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\'''\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -515,7 +512,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",' >> META_new.json
 	$(NOECHO) $(ECHO) '      "version" : "2"' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "name" : "myconst",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "name" : "Local-MatrixMultiplier",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "no_index" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "directory" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '         "t",' >> META_new.json
@@ -538,7 +535,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "1.00"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : ""' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -829,7 +826,7 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  lib/myconst.pm blib/lib/myconst.pm 
+	  lib/Local/MatrixMultiplier.pm blib/lib/Local/MatrixMultiplier.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
