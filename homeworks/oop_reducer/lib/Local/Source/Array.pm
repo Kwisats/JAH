@@ -6,19 +6,15 @@ use warnings;
 
 sub next() {
 	my $self = shift;
-	if ($self->{position} < @{$self->{array}}) { 
-		return $self->{array}[$self->{position}++];
-	}else {
-		return undef;
-	}
+	return $self->{array}[$self->{position}++] if ($self->{position} < $self->{array});
+	return undef;
 }
 
 sub new {
 	my $class = shift;
 	my %self = @_; 			
 	$self{position} = 0;
-	bless \%self, $class;
-	return \%self;
+	return bless \%self, $class;
 }
 		
 1;
