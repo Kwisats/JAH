@@ -2,6 +2,10 @@ package Local::Reducer;
 
 use strict;
 use warnings;
+
+use Local::Row::JSON;
+use Local::Row::Simple;
+
 =encoding utf8
 
 =head1 NAME
@@ -20,24 +24,11 @@ our $VERSION = '1.00';
 
 =cut
 
+sub reduce_n {}
 
-sub reduce_n {
-	return undef;	
-}
+sub reduced {}
 
-sub reduced {
-	return undef;
-}
-
-sub reduce_all {
-	my $self = shift;
-	my $sum = 0;
-	while ( defined (my $buff = $self->{source}->next()) ) {
-		my $row = *{$self->{row_class}}->new($buff);# my $row = Local::Row::JSON->new($buff);
-		$sum += $row->get($self->{field},0);
-	}
-	return $sum;
-}
+sub reduce_all {}
 
 
 1;

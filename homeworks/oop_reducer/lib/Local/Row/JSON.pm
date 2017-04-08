@@ -2,12 +2,9 @@ package Local::Row::JSON;
 
 use strict;
 use warnings;
-use DDP;
 use JSON::XS;
 
-sub get {
-	
-}
+use parent qw(Local::Row);
 
 sub new {
 	my $class = shift;
