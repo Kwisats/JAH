@@ -31,7 +31,7 @@ sub mult {
 			close $w;
 			$childs{$pid} = {iter => $i, reader => $r};
 			#reading		
-			waitpid($pid, WNOHANG);
+#			waitpid($pid, WNOHANG);
 			my ($s,$j) = ($childs{$pid}{iter}*$interval - 1, 0);		
 			my $buff = $childs{$pid}{reader};			
 			while (<$buff>) {
