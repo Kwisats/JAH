@@ -1,78 +1,91 @@
 package myconst;
-
-
-use strict;
 use warnings;
 use Scalar::Util 'looks_like_number';
-
 use DDP;
 use 5.010;
-#use Exporter;
-#@ISA = qw(Exporter);
-#use Exporter 'import';
-#use Exporter ();
-
-=encoding utf8
-
-=head1 NAME
-
-myconst - pragma to create exportable and groupped constants
-
-=head1 VERSION
-
-Version 1.00
-
-=cut
 
 our $VERSION = '1.00';
 
-=head1 SYNOPSIS
-package aaa;
+my @constants;
 
-use myconst math => {
-        PI => 3.14,
-        E => 2.7,
-    },
-    ZERO => 0,
-    EMPTY_STRING => '';
-
-package bbb;
-
-use aaa qw/:math PI ZERO/;
-
-print ZERO;             # 0
-print PI;               # 3.14
-=cut
+sub valid {
+	@arr = @_;
+	for my $i (0..$#arr) {
+		if ($i%2 == 0) {
+			if(ref $arr[$i] eq 'HASH' or ref $arr[$i] eq 'ARRAY') {
+				return 0;
+			}elsif (defined $arr[$i]) {
+				return 0 unless $arr[$i]=~/^\w+$/ and not $arr[$i] =~ /^[^a-zA-Z]+$/;	
+			}else {
+				return 0;
+			}
+		}else {
+			if (ref $arr[$i] eq 'HASH') {
+				return 0 unless %{$arr[$i]};
+				for (keys %{$arr[$i]}) {
+					return 0 if ref $arr[$i]->{$_} eq 'HASH' or ref $arr[$i]->{$_} eq 'ARRAY';
+					return 0 unless $_=~/^\w+$/ and not $_ =~ /^[^a-zA-Z]+$/;
+				}
+			}elsif (ref $arr[$i] eq 'ARRAY') {
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
 
 sub import{
 	shift;
-#return 0 if ref @_;
+	die unless valid(@_);
 	my %hash = @_;
-	my $caller = caller;	
-#work with 3 and 4 later
-	no strict 'refs';
-	#my @EXPORT_OK;
-	for my $key (keys %hash) {
-		unless (ref $hash{$key}) {
-			*{$caller.'::'.$key} = sub() {$hash{$key}};
-			#push @EXPORT_OK, $caller.'::'.$key;
-		}elsif ((ref $hash{$key} eq 'HASH') and (values %{$hash{$key}} > 0)) {
-			for my $deep_key (keys %{$hash{$key}}) {
-				*{$caller.'::'.$deep_key} = sub() {%{$hash{$key}}{$deep_key}};
+	my $caller = caller;
+	while (my ($key, $var) = each %hash){
+		if (ref $var eq 'HASH'){
+			for (keys %{$var}){
+					push @constants, {value => $var->{$_},
+					name => $_,
+					group => $key};
 			}
-		}	
+		}elsif (ref $var eq ''){
+			push @constants, {value => $var,
+			name => $key,
+			group => 'all'};
+		}else {
+			die;
+		}
 	}
-
-	
-
-	#myconst->export_to_level(1,@_);
+	for my $iter (@constants){
+		no warnings;#or you will see redefined
+		eval 'sub '.$caller.'::'.$iter->{name}.'(){ return $iter->{value};}';
+	}
+	eval 'sub '.$caller.'::import{
+		shift;
+		@imp = @_;
+		no warnings;#the same
+		my $caller = caller;
+		if (not @imp){
+			eval \'\';
+		}else {
+			for my $get_str (@imp){
+				if($get_str =~ /^:all/){
+					for my $var (@constants){
+						eval \'sub \'.$caller.\'::\'.$var->{name}.\'(){return $var->{value};} \';
+					}
+				}elsif ($get_str =~ /^:/) {
+					my @group_var = grep {":"."$_->{group}" eq $get_str} @constants;
+					for my $var (@group_var) {
+							eval \'sub \'.$caller.\'::\'.$var->{name}.\'(){return $var->{value};} \';
+					}
+				}else{
+					for my $var (@constants){
+						if ($var->{name} eq $get_str){
+							eval \'sub \'.$caller.\'::\'.$var->{name}.\'(){return $var->{value};} \';
+						}
+					}
+				}
+			}
+		}
+	}';
 }
 
 1;
-
-
-
-
-
-
-
