@@ -8,20 +8,20 @@ use AnyEvent::Socket;
 use AnyEvent::Handle;
 
 my %clients;
-
 tcp_server '0.0.0.0', 1234, sub {
     my $fh = shift;
-    
     my $handle; $handle = new AnyEvent::Handle
         fh => $fh,
         on_error => sub { $handle->destroy; };
-    
+    my $reader; 
+
     my $fin = sub {
         $handle->push_write("OK\n");
         $handle->destroy;
     };
 
     my $head = sub {
+        say "in head";
         unless ( exists $clients{$handle} ) {
             $handle->push_write("Need URL\n");
             return;
@@ -39,10 +39,12 @@ tcp_server '0.0.0.0', 1234, sub {
                 }else {
                     print "\nStatus $hdr->{Status} in head $clients{$handle}\n";
                 }
+                $handle->push_read(line => $reader);
             };
     };
 
-    my $get = sub {    
+    my $get = sub {
+        say "in get";
         unless ( exists $clients{$handle} ) {
             $handle->push_write("Need URL\n");
             return;
@@ -59,22 +61,21 @@ tcp_server '0.0.0.0', 1234, sub {
                 }else {
                     print "\nStatus $hdr->{Status} in get $clients{$handle}\n";
                 }
+                $handle->push_read(line => $reader);
             };
     };
 
-    my $reader; 
     $reader = sub {
-        my ($useless, $line) = @_;
-
+        shift;
+        my $line = shift;
         if ( $line =~ q/^URL (.+)/ ) {#I believe my client would not give me some trash)
             $handle->push_write("OK\n");
             $clients{$handle} = $1;
+            $handle->push_read(line => $reader);
         }
         $fin->() if $line =~ q/^FIN$/;
         $head->() if $line =~ q/^HEAD$/;
-        $get->() if $line =~ q/^GET$/;
-
-        $handle->push_read(line => $reader);
+        $get->() if $line =~ q/^GET$/;        
     };
 
     $handle->push_read(line => $reader);

@@ -23,8 +23,8 @@ sub {
 		};
 	
 	$handle->push_write ("URL https://github.com/Nikolo/Technosfera-perl/tree/anosov-crawler\n");
-	$handle->push_write("HEAD\n");
 	$handle->push_write("GET\n");
+	$handle->push_write("HEAD\n");
 	#$handle->push_write("FIN\n");
 	$handle->push_read (line => sub {
 		my ($handle, $line) = @_;
