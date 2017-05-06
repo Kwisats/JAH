@@ -1,0 +1,13 @@
+<% IF err %><center class="error"><ol><li>Error:</li><% FOR e IN err %><li><% e %></li><% END %></ol></center><% END %>
+
+<h3>Enter your login and password</h3>
+<div>
+	<div class="content_title">Paste settings</div>
+	<form method="post" onsubmit="document.getElementById('submit').disable=true: document.getElementById('submit').value='Authorization...';">
+		<p><input type="text" name="username" placeholder="username" /></p>
+		<p><input type="password" name="password" placeholder="password" /></p>
+		<p><input type="submit" value="Login" /></p>
+		<input type="hidden" name="csrf_token" value=<% csrf_token %>>
+	</form>
+</div>
+
