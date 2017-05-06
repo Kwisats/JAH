@@ -12,9 +12,9 @@ use List::Util qw(min);
 
 my %hash = ();
 sub run {
-    my ($start_page, $parallel_factor) = @_;
-    $start_page or die "You must setup url parameter";
-    $parallel_factor or die "You must setup parallel factor > 0";
+	my ($start_page, $parallel_factor) = @_;
+	$start_page or die "You must setup url parameter";
+	$parallel_factor or die "You must setup parallel factor > 0";
 
 	my @absolute_for_head = ();
 	my $active_requests = 0;
@@ -92,14 +92,14 @@ sub run {
 	say "I'm out";
 	
 	my $total_size = 0;
-    my @top10_list = ();
+	my @top10_list = ();
 
-    for my $url (sort{$hash{$b} <=> $hash{$a}} keys %hash ) { push @top10_list, $url; }
-    @top10_list = @top10_list[0..9];
-    $total_size += $_ for values %hash;
-   	p @top10_list;
-   	say $total_size;
-   	#p %hash;
+	for my $url (sort{$hash{$b} <=> $hash{$a}} keys %hash ) { push @top10_list, $url; }
+	@top10_list = @top10_list[0..9];
+	$total_size += $_ for values %hash;
+	p @top10_list;
+	say $total_size;
+	#p %hash;
 	return $total_size, @top10_list;
 };
 
