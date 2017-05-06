@@ -16,7 +16,7 @@ sub run {
 	$start_page or die "You must setup url parameter";
 	$parallel_factor or die "You must setup parallel factor > 0";
 
-	my @absolute_for_head = ();
+	my @absolute_for_head = ();#absolute references for head's queue
 	my $active_requests = 0;
 	push @absolute_for_head, $start_page;
 	
@@ -24,7 +24,7 @@ sub run {
 	my $i_head = 0;
 	my $next_get;
 	my $next_head; 
-	my $main_cycle; 
+	my $request_master; 
 	
 	$next_head = sub {
 		$cv->begin;
@@ -38,7 +38,7 @@ sub run {
 			if ($hdr->{Status} == 200) {
 				$next_get->($absolute_for_head[$cur]) if $hdr->{"content-type"} =~ /text\/html/;
 			} else {
-				say "Status $hdr->{Status} in head $absolute_for_head[$cur]";
+				warn "ALERT: status $hdr->{Status} in head $absolute_for_head[$cur]";
 			}
 			$cv->end;
 		};
@@ -56,8 +56,7 @@ sub run {
 		sub {
 			my @buff = ();
 			my ($body, $hdr) = @_;
-			if ($hdr->{Status} == 200) {#check 1000 in hash before writing					
-				#$hash{$page} = length(Encode::encode_utf8($body));#check without encode					
+			if ($hdr->{Status} == 200) {					
 				$hash{$page} = length($body);
 				my @arr_ref = $body =~ /href="(\/[^#"][^"]+)"/g;					
 				for (@arr_ref) {
@@ -67,19 +66,18 @@ sub run {
 					push @absolute_for_head, $_ unless exists $hash{$_};
 				}
 			}else {
-				say "Status $hdr->{Status} in get $page";
+				warn "ALERT: status $hdr->{Status} in get $page";
 			}
 			$cv->end;
 			$active_requests--;
-			$main_cycle->();
+			$request_master->();
 		};
 	};
 
-	$main_cycle = sub {
+	$request_master = sub {
 		my $requests_spaces = $parallel_factor - $active_requests;
 		my $not_headed = @absolute_for_head - $i_head;
 		my $number_to_start = min( $requests_spaces, $not_headed);
-		#print "$requests_spaces\t$not_headed\t$number_to_start\n";
 		for (1..$number_to_start) {
 			$next_head->();
 		}
@@ -87,7 +85,7 @@ sub run {
 	};
 	
 	$cv->begin;
-	$main_cycle->();
+	$request_master->();
 	$cv->recv;
 	say "I'm out";
 	
