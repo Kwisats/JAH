@@ -81,7 +81,7 @@ sub run {
 		for (1..$number_to_start) {
 			$next_head->();
 		}
-		$cv->end if @absolute_for_head > 1000 or $number_to_start == 0; 
+		$cv->end if @absolute_for_head > 1000 or ($not_headed == 0 and $active_requests == 0); 
 	};
 	
 	$cv->begin;
