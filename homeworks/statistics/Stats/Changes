@@ -1,0 +1,6 @@
+Revision history for Perl extension Stats.
+
+0.01  Fri May 12 21:00:47 2017
+	- original version; created by h2xs 1.23 with options
+		-b 5.18.0 -n Stats
+

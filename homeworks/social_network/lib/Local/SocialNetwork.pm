@@ -6,34 +6,30 @@ use strict;
 use warnings;
 use DBI;
 use DDP;
-use Archive::Zip;
-use DBD::mysql;
-use Getopt::Long;
+use FindBin;
+use lib "$FindBin::Bin/..";
+use Local::ConnectNetwork qw(connect);
+use Local::User;
 
-my $db_name = 'SocialNetwork';
-my $user_name = 'popyan';
-my $password = 'popyan71b14';
-
-my $dbh = DBI->connect("dbi:mysql:dbname=$db_name", $user_name, $password, {AutoCommit => 0, RaiseError => 1});
-
-my $str = "select (first_name, last_name, friend_id) from user left join user_relation on user.id = user_relation.user_id where friend_id = NULL";
-my $no_friends = $dbh->prepare($str);
-
-$no_friends->execute();
-my @row;
-while(@row = $no_friends->fetchrow_array()) { 
-	p @row;
+sub no_friends {
+	my $dbh = Local::ConnectNetwork::connect();
+	my $str = "SELECT * FROM users LEFT OUTER JOIN relations ON user.id = user_id WHERE friend_id = NULL";
+	my $nofriends = $dbh->selectall_arrayref($str);
+	p $nofriends;
+	return $nofriends;
 }
 
+sub common_friends {
+	my ($id1, $id2) = @_;
+	my $user1 = Local::User->new($id1);
+	my $user2 = Local::User->new($id2);
+	say "this function is in the process of creation";
+}
 
+sub amount_of_hands {
+	say "this function is in the process of creation";
+}
 
-
-
-
-
-
-
-
-$dbh->commit();
+our @EXPORT_OK = qw(no_friends common_friends amount_of_friends);
 
 1;
