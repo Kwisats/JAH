@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use DBI;
 use DDP;
+use 5.010;
 use FindBin;
 use lib "$FindBin::Bin/..";
 use Local::ConnectNetwork qw(connect);
@@ -13,10 +14,22 @@ use Local::User;
 
 sub no_friends {
 	my $dbh = Local::ConnectNetwork::connect();
-	my $str = "SELECT * FROM users LEFT OUTER JOIN relations ON user.id = user_id WHERE friend_id = NULL";
-	my $nofriends = $dbh->selectall_arrayref($str);
-	p $nofriends;
-	return $nofriends;
+	my $str1 = "SELECT id FROM users";
+	#my $str2 = "SELECT users.id FROM users INNER JOIN relations ON users.id = user_id GROUP BY users.id HAVING COUNT(users.id) > 1";
+	#my $str2 = "SELECT user_id FROM relations GROUP BY user_id HAVING COUNT(user_id) > 1 ORDER BY user_id";
+	my $str2 = "SELECT users.id FROM WHERE id NOT IN (SELECT user_id FROM relations)";
+	#my $str2 = "SELECT users.id FROM users LEFT JOIN relations ON users.id = relations.user_id WHERE friend_id IS NULL";
+	my $all = $dbh->selectall_arrayref($str1);
+	my $have_friends = $dbh->selectall_arrayref($str2);
+	p $have_friends;
+	my $j = 0;
+	say "compare\n";
+	for (my $i = 0; $i < @$all; $i++) {
+		if ($all->[$i]->[0] == $have_friends->[$j]->[0]) {$j++;}
+		else {say $all->[$i]->[0];}
+	}
+	say $have_friends->[0]->[0];
+	return 1;
 }
 
 sub common_friends {
@@ -31,5 +44,5 @@ sub amount_of_hands {
 }
 
 our @EXPORT_OK = qw(no_friends common_friends amount_of_friends);
-
+no_friends();
 1;

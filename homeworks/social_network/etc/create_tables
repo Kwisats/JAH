@@ -1,16 +1,12 @@
 CREATE TABLE users (
-  id INTEGER AUTO_INCREMENT NOT NULL,
+  id INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
   first_name VARCHAR(255) NOT NULL,
-  second_name VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-);
+  second_name VARCHAR(255) NOT NULL
+) CHARSET utf8;
 
 CREATE TABLE relations (
-  id INTEGER AUTO_INCREMENT NOT NULL,
+  id INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
   user_id INTEGER NOT NULL,
-  friend_id INTEGER,
-  PRIMARY KEY (id)
-);
+  friend_id INTEGER
+) CHARSET utf8;
 
-CREATE INDEX idx_user ON relations (user_id);
-CREATE INDEX idx_friend ON relations (friend_id);

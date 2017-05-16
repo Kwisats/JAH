@@ -16,12 +16,12 @@ sub new {
 	my $sth = $dbh->prepare("SELECT first_name, second_name FROM users WHERE id = (?)");
 	$sth->execute($user_id);
 	my $buff = $sth->fetchrow_hashref();
-	$self{first_name} = $buff{first_name};
-	$self{second_name} = $buff{second_name};
+	$self{first_name} = $buff->{first_name};
+	$self{second_name} = $buff->{second_name};
 
-	my $sth = $dbh->prepare("SELECT friend_id FROM relations WHERE user_id = (?)");
+	$sth = $dbh->prepare("SELECT friend_id FROM relations WHERE user_id = (?)");
 	$sth->execute($user_id);
-	my $buff = $sth->fetchrow_arrayref();
+	$buff = $sth->fetchrow_arrayref();
 	$self{friends} = @$buff;
 
 	return bless \%self, $class;
@@ -34,7 +34,7 @@ sub get_names {
 
 sub get_friends {
 	my $self = shift;
-	return $self{friends};
+	return $self->{friends};
 }
 
 1;
