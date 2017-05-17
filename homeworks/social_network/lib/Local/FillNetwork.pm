@@ -22,7 +22,7 @@ print "Table users is being prepared\n";
 my $zip = take_string("etc/user.zip");
 my @names;
 while($zip =~ /\d+\s(\D+)\s(\D+)\s/g) {  
-	push @names, "'$1','$2'";
+	push @names, "'$1','$2'"; #may be decode?
 }
 my $buff_str = join '),(', @names;
 print "make insert\n";
@@ -62,5 +62,5 @@ $index->execute();
 print "The database is ready!\n";
 
 $dbh->commit();#what is the problem of this commit???
-
+$dbh->disconnect;
 1;

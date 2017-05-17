@@ -21,15 +21,17 @@ sub new {
 
 	$sth = $dbh->prepare("SELECT friend_id FROM relations WHERE user_id = (?)");
 	$sth->execute($user_id);
-	$buff = $sth->fetchrow_arrayref();
-	$self{friends} = @$buff;
-
+	$buff = $sth->fetchall_arrayref();
+	my @friends;
+	push @friends, $_->[0] for(@$buff); 
+	$self{friends} = \@friends;
+	$dbh->disconnect;
 	return bless \%self, $class;
 }
 
 sub get_names {
 	my $self = shift;
-	return (first_name => $self->{first_name}, second_name => $self->{second_name});
+	return {first_name => $self->{first_name}, second_name => $self->{second_name}};
 }
 
 sub get_friends {

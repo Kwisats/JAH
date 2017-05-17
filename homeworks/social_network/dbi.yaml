@@ -1,8 +1,7 @@
-SocialN:
-  dsn:  "dbi:mysql:host=localhost;database=SocialN"
-  user: "popyan"
-  password: "popyan71b14"
-  dbi_params:
-    RaiseError: 1
-    AutoCommit: 0
-    mysql_enable_utf8: 1
+dsn:  "dbi:mysql:host=localhost;database=SocialN"
+user: "popyan"
+password: "popyan71b14"
+dbi_params:
+  RaiseError: 1
+  AutoCommit: 0
+  mysql_enable_utf8: 1
