@@ -1,7 +1,6 @@
 package DBI::ActiveRecord::DB::MySQL;
 use Mouse;
 extends 'DBI::ActiveRecord::DB';
-
 use Carp qw/confess/;
 
 =encoding utf8
@@ -65,7 +64,7 @@ sub _select {
 Данные для полей C<$fields> со значениями C<$values> вставляются в таблицу C<$table>. Если первичный ключ автоинкрементальный, то его имя должно быть передано в параметре C<$autoinc_field>.
 
 =cut
-
+use 5.010;
 sub _insert {
     my ($self, $table, $autoinc_field, $fields, $values) = @_;
 
@@ -99,12 +98,13 @@ sub _update {
 
     my $dbh = $self->connection;
 
-    my $fields_str = join ", ", @$fields;
-    my $placeholders = join ", ", map { "?" } @$fields; 
+    push @$values, $key_value;
+
+    my $placeholders = join ", ", map { "$_ = ?" } @$fields; 
 
     $dbh->begin_work;
     
-    if($dbh->do("UPDATE $table SET ($fields_str) VALUES ($placeholders) WHERE $key_field = $key_value ", {}, @$values)) {
+    if($dbh->do("UPDATE $table SET $placeholders WHERE $key_field = ? ", {}, @$values)) {
         $dbh->commit; 
     } else {
         $dbh->rollback;

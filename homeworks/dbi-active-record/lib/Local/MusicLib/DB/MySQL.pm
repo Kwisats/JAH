@@ -10,7 +10,7 @@ sub _build_connection_params {
 		"popyan71b14",
 		{
 			"RaiseError" => 1, 
-			"AutoCommit" => 0, 
+			"AutoCommit" => 1, 
 			"mysql_enable_utf8" => 1
 		}
     ]

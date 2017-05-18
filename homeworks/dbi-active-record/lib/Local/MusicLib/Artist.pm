@@ -2,7 +2,12 @@ package Local::MusicLib::Artist;
 
 use DBI::ActiveRecord;
 use Local::MusicLib::DB::MySQL;
+
 use Local::MusicLib::TimeChanger qw(ct_serializer ct_deserializer);
+
+db 'Local::MusicLib::DB::MySQL';
+
+table 'artists';
 
 has_field id => (
     isa => 'Int',
